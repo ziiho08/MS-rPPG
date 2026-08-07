@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MS-rPPG: Multi-spectral rPPG for Driver Monitoring</title>
+
+  <!-- SEO / Social -->
+  <meta name="description" content="MS-rPPG: Multi-spectral State Space Model for Remote Photoplethysmography in Driver Monitoring Systems. ICRA 2026." />
+  <meta property="og:title" content="MS-rPPG: Multi-spectral rPPG for Driver Monitoring" />
+  <meta property="og:description" content="A multi-spectral framework combining RGB and NIR video for robust remote heart rate estimation in driving environments." />
+  <meta name="citation_title" content="MS-rPPG: Multi-spectral State Space Model for Remote Photoplethysmography in Driver Monitoring Systems" />
+  <meta name="citation_author" content="Choi, Jiho" />
+  <meta name="citation_author" content="Lee, Sang Jun" />
+  <meta name="citation_conference_title" content="IEEE International Conference on Robotics and Automation (ICRA)" />
+  <meta name="citation_year" content="2026" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f4f6fa;
+      --surface2: #e8ecf3;
+      --border: rgba(0,0,0,0.1);
+      --border-accent: rgba(37,99,235,0.3);
+      --text: #111827;
+      --text-muted: #4b5563;
+      --accent: #2563eb;
+      --accent2: #7c3aed;
+      --accent3: #059669;
+      --red: #dc2626;
+      --pill-bg: rgba(37,99,235,0.08);
+      --pill-border: rgba(37,99,235,0.25);
+      --max-w: 900px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 2rem; height: 56px;
+    }
+    nav ul {
+      display: flex; gap: 2rem; list-style: none;
+    }
+    nav a {
+      color: var(--text-muted); text-decoration: none;
+      font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* ── SECTIONS ── */
+    section { padding: 5rem 1.5rem; }
+    .container { max-width: var(--max-w); margin: 0 auto; }
+
+    /* ── HERO ── */
+    #hero {
+      padding-top: 7rem; padding-bottom: 4rem;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(37,99,235,0.06) 0%, transparent 70%);
+      text-align: center;
+    }
+    .venue-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--pill-bg); border: 1px solid var(--pill-border);
+      color: var(--accent); font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0.3rem 0.9rem; border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+    .venue-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+    .icra-label {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(1.55rem, 3.6vw, 2.65rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 0.4rem;
+      color: #111827;
+    }
+    h1.title {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(1.55rem, 3.6vw, 2.65rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+      color: #111827;
+    }
+    .subtitle-tag {
+      font-size: 0.9rem; color: var(--text-muted);
+      margin-bottom: 2.2rem;
+    }
+
+    .authors {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 0.4rem 1.5rem; margin-bottom: 0.8rem;
+    }
+    .author {
+      font-size: 1.35rem; color: var(--text);
+      font-weight: 500;
+    }
+    .author sup { color: var(--accent); font-size: 0.7rem; }
+    .author.corresponding::after { content: '*'; color: #111827; margin-left: 1px; font-size: 0.8rem; }
+
+    .affiliation {
+      font-size: 0.85rem; color: var(--text-muted);
+      margin-bottom: 2.5rem;
+    }
+    .affiliation sup { color: var(--accent); }
+
+    /* ── LINK BUTTONS ── */
+    .links {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.55rem 1.3rem; border-radius: 10px;
+      font-size: 0.875rem; font-weight: 600; text-decoration: none;
+      transition: all 0.2s; border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+    .btn-disabled {
+      background: transparent; color: var(--text-muted);
+      border-color: var(--border); cursor: not-allowed; opacity: 0.5;
+    }
+    .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* ── TEASER ── */
+    .teaser-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+    .teaser-placeholder {
+      background: linear-gradient(135deg, var(--surface2), #dde3ef);
+      border: 1px dashed var(--border-accent);
+      border-radius: 12px;
+      height: 320px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--text-muted); gap: 0.75rem;
+      font-size: 0.9rem;
+    }
+    .teaser-placeholder svg { opacity: 0.4; width: 40px; height: 40px; }
+    .teaser-caption {
+      margin-top: 1rem; text-align: center;
+      font-size: 0.82rem; color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .teaser-caption strong { color: var(--text); }
+
+    /* ── SECTION TITLE ── */
+    .sec-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.55rem; font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.65rem;
+    }
+    .sec-title::before {
+      content: ''; display: inline-block;
+      width: 4px; height: 1.3em; border-radius: 2px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent2));
+    }
+
+    /* ── ABSTRACT ── */
+    #abstract { background: var(--surface); }
+    .abstract-text {
+      font-size: 1rem; color: var(--text-muted); line-height: 1.85;
+      border-left: 3px solid var(--border-accent);
+      padding-left: 1.5rem;
+      text-align: justify;
+    }
+
+    /* ── OVERVIEW ── */
+    .overview-img {
+      background: var(--surface2);
+      border: 1px dashed var(--border-accent);
+      border-radius: 12px;
+      height: 260px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    /* ── CONTRIBUTIONS ── */
+    .contrib-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .contrib-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.4rem 1.2rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .contrib-card:hover { border-color: var(--border-accent); transform: translateY(-2px); }
+    .contrib-icon {
+      font-size: 1.6rem; margin-bottom: 0.75rem;
+    }
+    .contrib-card h3 {
+      font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem;
+      color: var(--accent);
+      font-family: 'Sora', sans-serif;
+    }
+    .contrib-card p { font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── RESULTS TABLE ── */
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    thead { background: var(--surface2); }
+    th {
+      padding: 0.75rem 1rem; text-align: center;
+      color: var(--text-muted); font-weight: 600; font-size: 0.78rem;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 0.65rem 1rem; text-align: center;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr.ours td { background: rgba(99,179,255,0.05); color: var(--text); font-weight: 700; }
+    tr.ours td:first-child { color: var(--accent); }
+    .best { color: var(--accent3) !important; font-weight: 700 !important; }
+    .method-col { text-align: left !important; }
+
+    /* ── CAROUSEL ── */
+    .carousel {
+      position: relative; overflow: hidden; border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+    .carousel-track {
+      display: flex; transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .carousel-slide {
+      min-width: 100%;
+    }
+    .slide-img {
+      background: linear-gradient(135deg, var(--surface2), #dde3ef);
+      height: 300px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.5rem; color: var(--text-muted); font-size: 0.85rem;
+    }
+    .slide-img svg { opacity: 0.35; width: 36px; height: 36px; }
+    .carousel-caption {
+      background: var(--surface);
+      padding: 1rem 1.5rem;
+      font-size: 0.83rem; color: var(--text-muted); line-height: 1.6;
+    }
+    .carousel-caption strong { color: var(--text); }
+    .carousel-controls {
+      display: flex; align-items: center; justify-content: center;
+      gap: 1rem; margin-top: 1.2rem;
+    }
+    .carousel-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 0.5rem 0.9rem;
+      cursor: pointer; font-size: 1rem; transition: all 0.15s;
+    }
+    .carousel-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .carousel-dots { display: flex; gap: 0.4rem; }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); cursor: pointer; transition: background 0.2s;
+    }
+    .dot.active { background: var(--accent); }
+
+    /* ── VIDEO PLACEHOLDER ── */
+    .video-placeholder {
+      background: linear-gradient(135deg, var(--surface2), #dde3ef);
+      border: 1px dashed var(--border-accent);
+      border-radius: 12px; height: 340px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.75rem; color: var(--text-muted); font-size: 0.88rem;
+    }
+    .video-placeholder svg { opacity: 0.4; width: 48px; height: 48px; }
+    .video-note {
+      margin-top: 0.75rem; font-size: 0.78rem;
+      color: var(--text-muted); text-align: center;
+    }
+    .video-note a { color: var(--accent); text-decoration: none; }
+    .video-note a:hover { text-decoration: underline; }
+
+    /* ── BIBTEX ── */
+    #bibtex { background: var(--surface); }
+    .bibtex-box {
+      position: relative;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .bibtex-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.6rem 1rem;
+      background: var(--surface2); border-bottom: 1px solid var(--border);
+    }
+    .bibtex-label { font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+    .copy-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 0.78rem;
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.3rem 0.6rem; border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .copy-btn:hover { background: var(--surface); color: var(--accent); }
+    .copy-btn.copied { color: var(--accent3); }
+    pre {
+      padding: 1.2rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .kw { color: var(--accent2); }
+    .str { color: var(--accent3); }
+    .field { color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 2.5rem 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem; color: var(--text-muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    /* ── NOTICE BADGE ── */
+    .notice {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2);
+      color: var(--red); font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    /* ── SCROLL ANIMATION ── */
+    .fade-in {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 640px) {
+      nav ul { gap: 1rem; }
+      h1.title { font-size: 1.6rem; }
+      .contrib-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <ul>
+    <li><a href="#abstract">Abstract</a></li>
+    <li><a href="#method">Method</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#bibtex">BibTeX</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="container">
+    <div class="venue-badge" style="display:none;"><span></span>ICRA 2026</div>
+
+    <p class="icra-label">[ICRA 2026]</p>
+
+    <h1 class="title">
+      MS-rPPG:<br/>
+      Multi-spectral State Space Model for Remote Photoplethysmography in Driver Monitoring Systems
+    </h1>
+
+    <div class="authors">
+      <span class="author">Jiho Choi</span>
+      <span class="author corresponding">Sang Jun Lee</span>
+    </div>
+    <p class="affiliation">
+      Division of Electronics and Information Engineering, Jeonbuk National University, Republic of Korea<br/>
+      <small>* Corresponding author</small>
+    </p>
+
+    <div class="links">
+      <a href="#" class="btn btn-disabled" title="Paper link coming soon">
+        <!-- PDF icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Paper (Coming Soon)
+      </a>
+      <a href="https://github.com/ziiho08/MS-rPPG" class="btn btn-primary" target="_blank" rel="noopener">
+        <!-- GitHub icon -->
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.66-.22.66-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8c.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.16.58.67.48A10.01 10.01 0 0 0 22 12c0-5.52-4.48-10-10-10z"/></svg>
+        Code
+      </a>
+      <a href="#demo" class="btn btn-outline">
+        <!-- Video icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Demo
+      </a>
+      <a href="https://github.com/ziiho08/MS-Drive" class="btn btn-outline" target="_blank" rel="noopener">
+        <!-- Database icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        Dataset
+      </a>
+    </div>
+
+    <!-- Teaser -->
+    <div class="teaser-box fade-in">
+      <div class="teaser-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+        <span>Teaser image / Figure 2 from paper</span>
+        <span style="font-size:0.75rem; opacity:0.6">Replace with your framework overview figure</span>
+      </div>
+      <p class="teaser-caption">
+        <strong>Overview of MS-rPPG.</strong>
+        Our method integrates RGB and NIR face videos for robust remote physiological measurement under real-world driving conditions.
+        MS-rPPG includes the <strong>CSLM</strong> module for multi-spectral fusion and the <strong>MS-Mamba</strong> block with
+        temporal and bidirectional channel scanning.
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── ABSTRACT ── -->
+<section id="abstract">
+  <div class="container fade-in">
+    <h2 class="sec-title">Abstract</h2>
+    <p class="abstract-text">
+      Remote photoplethysmography (rPPG) is a camera-based technique for measuring physiological signals,
+      particularly cardiac activity. From the remotely measured signals, heart rate can be estimated, which is crucial
+      for health monitoring. In this study, we investigate a driver health monitoring system based on remote heart
+      rate estimation. However, driving environments represent uncontrolled settings where videos are subject to
+      varying illumination conditions and frequent head movements. We introduce <strong style="color:var(--text)">MS-rPPG</strong>,
+      a multi-spectral framework that combines RGB with near-infrared (NIR) face video to alleviate rPPG estimation
+      under challenging driving conditions. To combine the complementary features from two spectral videos, we propose
+      a <strong style="color:var(--text)">cross-spectral linear modulation (CSLM)</strong> strategy based on
+      frequency-domain analysis. Moreover, we introduce <strong style="color:var(--text)">MS-Mamba</strong>, a novel
+      state space model designed to effectively model long-range temporal dependencies while jointly capturing
+      cross-channel interactions between multi-spectral features. We collected a real-world dataset called
+      <strong style="color:var(--text)">MS-Drive</strong>, recorded from 50 participants while driving a vehicle.
+      Experimental results indicate that MS-rPPG shows better robustness and heart rate estimation accuracy than
+      previous methods, highlighting its promise for driver health monitoring.
+    </p>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── METHOD ── -->
+<section id="method">
+  <div class="container">
+    <h2 class="sec-title fade-in">Method</h2>
+
+    <div class="fade-in" style="margin-bottom:2rem;">
+      <div class="overview-img">
+        <span style="text-align:center">
+          📷 Replace with Fig. 2 — Framework overview diagram<br/>
+          <small style="opacity:0.6; font-size:0.75rem;">e.g., static/images/framework.png</small>
+        </span>
+      </div>
+    </div>
+
+    <div class="contrib-grid fade-in">
+      <div class="contrib-card">
+        <div class="contrib-icon">🌈</div>
+        <h3>Multi-spectral Input</h3>
+        <p>Combines RGB and NIR facial video to leverage complementary spectral properties — RGB provides high-SNR pulse signals under good lighting; NIR is robust to illumination changes.</p>
+      </div>
+      <div class="contrib-card">
+        <div class="contrib-icon">⚡</div>
+        <h3>CSLM</h3>
+        <p>Cross-Spectral Linear Modulation uses FFT-based physiological priors (40–200 bpm band) to adaptively modulate one spectral stream with scale and shift parameters from the other.</p>
+      </div>
+      <div class="contrib-card">
+        <div class="contrib-icon">🔄</div>
+        <h3>MS-Mamba</h3>
+        <p>Multi-spectral Mamba block with temporal SSM scanning per modality, followed by bidirectional channel-axis scanning to capture inter-channel dependencies with linear complexity.</p>
+      </div>
+      <div class="contrib-card">
+        <div class="contrib-icon">🚗</div>
+        <h3>MS-Drive Dataset</h3>
+        <p>Real-world driving dataset with 50 participants across Fitzpatrick skin types 2–6, with synchronized RGB, 850 nm NIR video, and ECG ground truth signals.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── RESULTS ── -->
+<section id="results">
+  <div class="container">
+    <h2 class="sec-title fade-in">Experimental Results</h2>
+
+    <!-- Intra-dataset -->
+    <div class="fade-in" style="margin-bottom:2.5rem;">
+      <h3 style="font-size:1rem; color:var(--text-muted); margin-bottom:0.75rem; font-weight:600;">
+        Intra-dataset Evaluation · MR-NIRP Car Dataset (975 nm NIR)
+      </h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="method-col" rowspan="2">Method</th>
+              <th colspan="5">Small Motion</th>
+              <th colspan="5">Large Motion</th>
+            </tr>
+            <tr>
+              <th>MAE↓</th><th>RMSE↓</th><th>MAPE↓</th><th>Pearson↑</th><th>SNR↑</th>
+              <th>MAE↓</th><th>RMSE↓</th><th>MAPE↓</th><th>Pearson↑</th><th>SNR↑</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="method-col">DeepPhys</td><td>11.746</td><td>13.165</td><td>16.753</td><td>-0.621</td><td>-11.486</td><td>16.336</td><td>17.443</td><td>22.675</td><td>-0.003</td><td>-11.715</td></tr>
+            <tr><td class="method-col">EfficientPhys</td><td>12.016</td><td>15.448</td><td>15.665</td><td>-0.464</td><td>-11.581</td><td>13.771</td><td>16.915</td><td>18.377</td><td>0.043</td><td>-10.091</td></tr>
+            <tr><td class="method-col">PhysNet</td><td>6.616</td><td>10.257</td><td>10.123</td><td>-0.118</td><td>-5.329</td><td>6.211</td><td>7.817</td><td>9.013</td><td>0.006</td><td>-5.512</td></tr>
+            <tr><td class="method-col">PhysFormer</td><td>5.363</td><td>7.671</td><td>7.473</td><td>0.464</td><td>-10.777</td><td>34.833</td><td>35.738</td><td>49.78</td><td>0.229</td><td>-12.479</td></tr>
+            <tr><td class="method-col">RhythmFormer</td><td>6.211</td><td>9.077</td><td>9.358</td><td>0.034</td><td>-1.780</td><td>7.021</td><td>9.125</td><td>9.991</td><td>0.581</td><td>-7.854</td></tr>
+            <tr><td class="method-col">PhysMamba</td><td>8.101</td><td>10.834</td><td>11.696</td><td>-0.362</td><td>-6.135</td><td>26.462</td><td>27.391</td><td>36.206</td><td>NaN</td><td>NaN</td></tr>
+            <tr><td class="method-col">RhythmMamba</td><td>7.561</td><td>10.240</td><td>11.151</td><td>-0.344</td><td>-6.181</td><td>9.991</td><td>13.517</td><td>14.828</td><td>0.254</td><td>-11.088</td></tr>
+            <tr class="ours">
+              <td class="method-col">MS-rPPG (Ours)</td>
+              <td class="best">4.320</td><td class="best">6.038</td><td class="best">6.470</td><td class="best">0.728</td><td class="best">-1.606</td>
+              <td class="best">4.320</td><td class="best">6.447</td><td class="best">6.546</td><td class="best">0.589</td><td class="best">-5.228</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Cross-dataset -->
+    <div class="fade-in">
+      <h3 style="font-size:1rem; color:var(--text-muted); margin-bottom:0.75rem; font-weight:600;">
+        Cross-dataset Evaluation · Tested on MS-Drive
+      </h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="method-col" rowspan="2">Method</th>
+              <th colspan="3">Small Motion</th>
+              <th colspan="3">Large Motion</th>
+            </tr>
+            <tr>
+              <th>MAE↓</th><th>RMSE↓</th><th>MAPE↓</th>
+              <th>MAE↓</th><th>RMSE↓</th><th>MAPE↓</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="method-col">EfficientPhys</td><td>25.659</td><td>28.690</td><td>29.368</td><td>31.479</td><td>33.814</td><td>36.360</td></tr>
+            <tr><td class="method-col">PhysNet</td><td>13.189</td><td>26.397</td><td>15.073</td><td>13.345</td><td>15.939</td><td>15.449</td></tr>
+            <tr><td class="method-col">PhysFormer</td><td>14.905</td><td>17.794</td><td>17.190</td><td>22.142</td><td>25.338</td><td>29.090</td></tr>
+            <tr><td class="method-col">RhythmFormer</td><td>13.201</td><td>15.732</td><td>15.286</td><td>11.245</td><td>14.347</td><td>13.139</td></tr>
+            <tr><td class="method-col">PhysMamba</td><td>14.370</td><td>17.509</td><td>16.549</td><td>38.152</td><td>39.844</td><td>44.560</td></tr>
+            <tr><td class="method-col">RhythmMamba</td><td>12.373</td><td>15.867</td><td>14.273</td><td>11.785</td><td>14.257</td><td>14.414</td></tr>
+            <tr class="ours">
+              <td class="method-col">MS-rPPG (Ours)</td>
+              <td class="best">11.797</td><td class="best">14.246</td><td class="best">13.927</td>
+              <td class="best">9.601</td><td class="best">12.745</td><td class="best">11.406</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── DEMO / CAROUSEL ── -->
+<section id="demo">
+  <div class="container">
+    <h2 class="sec-title fade-in">Qualitative Results</h2>
+
+    <!-- Image carousel -->
+    <div class="fade-in" style="margin-bottom:2.5rem;">
+      <h3 style="font-size:0.95rem; color:var(--text-muted); margin-bottom:0.9rem; font-weight:600;">Image Gallery</h3>
+      <div class="carousel" id="imgCarousel">
+        <div class="carousel-track" id="imgTrack">
+
+          <div class="carousel-slide">
+            <div class="slide-img">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Figure 4: MS-Drive dataset examples</span>
+              <small style="opacity:0.5; font-size:0.72rem;">Replace with static/images/msdrive_samples.png</small>
+            </div>
+            <div class="carousel-caption">
+              <strong>MS-Drive Dataset Samples.</strong>
+              Example images showing simultaneously captured RGB and NIR facial videos
+              across Fitzpatrick skin types II–VI from 50 participants under real-world driving conditions.
+            </div>
+          </div>
+
+          <div class="carousel-slide">
+            <div class="slide-img">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Figure 7: MR-NIRP Test Results</span>
+              <small style="opacity:0.5; font-size:0.72rem;">Replace with static/images/mrnipr_results.png</small>
+            </div>
+            <div class="carousel-caption">
+              <strong>Intra-dataset Qualitative Results (MR-NIRP).</strong>
+              Visualization of predicted PPG signals (blue) vs. ground truth (red) under
+              small and large motion conditions. MS-rPPG (ours) shows significantly closer alignment.
+            </div>
+          </div>
+
+          <div class="carousel-slide">
+            <div class="slide-img">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Figure 8: MS-Drive Cross-dataset Results</span>
+              <small style="opacity:0.5; font-size:0.72rem;">Replace with static/images/msdrive_results.png</small>
+            </div>
+            <div class="carousel-caption">
+              <strong>Cross-dataset Qualitative Results (MS-Drive).</strong>
+              Evaluated on our collected real-world driving dataset.
+              Our model shows robust HR estimation even under challenging driving scenarios
+              with large head motion and varying illumination.
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="carousel-controls">
+        <button class="carousel-btn" id="imgPrev">←</button>
+        <div class="carousel-dots" id="imgDots"></div>
+        <button class="carousel-btn" id="imgNext">→</button>
+      </div>
+    </div>
+
+    <!-- Demo video -->
+    <div class="fade-in">
+      <h3 style="font-size:0.95rem; color:var(--text-muted); margin-bottom:0.9rem; font-weight:600;">Demo Video</h3>
+      <div class="video-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>MS-Drive Demo Video</span>
+        <small style="opacity:0.6; font-size:0.75rem;">Replace with YouTube embed or local video</small>
+      </div>
+      <p class="video-note">
+        To embed a YouTube video, replace the placeholder above with:<br/>
+        <code style="font-family: 'JetBrains Mono', monospace; font-size:0.78rem; color:var(--accent2);">
+          &lt;iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" ...&gt;&lt;/iframe&gt;
+        </code>
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── BIBTEX ── -->
+<section id="bibtex">
+  <div class="container">
+    <h2 class="sec-title fade-in">BibTeX</h2>
+    <div class="bibtex-box fade-in">
+      <div class="bibtex-header">
+        <span class="bibtex-label">bibtex</span>
+        <button class="copy-btn" id="copyBtn" onclick="copyBibtex()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="copyLabel">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtexContent"><span class="kw">@inproceedings</span>{<span class="field">choi2026msrppg</span>,
+  <span class="field">title</span>     = {<span class="str">MS-rPPG: Multi-spectral State Space Model for Remote
+             Photoplethysmography in Driver Monitoring Systems</span>},
+  <span class="field">author</span>    = {<span class="str">Choi, Jiho and Lee, Sang Jun</span>},
+  <span class="field">booktitle</span> = {<span class="str">IEEE International Conference on Robotics and Automation (ICRA)</span>},
+  <span class="field">year</span>      = {<span class="str">2026</span>},
+  <span class="field">note</span>      = {<span class="str">Jeonbuk National University, Republic of Korea</span>}
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p>
+    Website template inspired by
+    <a href="https://eliahuhorwitz.github.io/Academic-project-page-template/" target="_blank" rel="noopener">Academic Project Page Template</a>.
+  </p>
+</footer>
+
+<!-- ── SCRIPTS ── -->
+<script>
+  // ── Fade-in on scroll ──
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // ── Carousel ──
+  function makeCarousel(trackId, prevId, nextId, dotsId) {
+    const track = document.getElementById(trackId);
+    const prev  = document.getElementById(prevId);
+    const next  = document.getElementById(nextId);
+    const dotsContainer = document.getElementById(dotsId);
+    const slides = track.querySelectorAll('.carousel-slide');
+    let cur = 0;
+
+    slides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.onclick = () => go(i);
+      dotsContainer.appendChild(dot);
+    });
+
+    function go(n) {
+      cur = (n + slides.length) % slides.length;
+      track.style.transform = `translateX(-${cur * 100}%)`;
+      dotsContainer.querySelectorAll('.dot').forEach((d, i) =>
+        d.classList.toggle('active', i === cur));
+    }
+    prev.onclick = () => go(cur - 1);
+    next.onclick = () => go(cur + 1);
+  }
+
+  makeCarousel('imgTrack', 'imgPrev', 'imgNext', 'imgDots');
+
+  // ── Copy BibTeX ──
+  function copyBibtex() {
+    const raw = `@inproceedings{choi2026msrppg,
+  title     = {MS-rPPG: Multi-spectral State Space Model for Remote
+             Photoplethysmography in Driver Monitoring Systems},
+  author    = {Choi, Jiho and Lee, Sang Jun},
+  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
+  year      = {2026},
+  note      = {Jeonbuk National University, Republic of Korea}
+}`;
+    navigator.clipboard.writeText(raw).then(() => {
+      const btn = document.getElementById('copyBtn');
+      const lbl = document.getElementById('copyLabel');
+      btn.classList.add('copied');
+      lbl.textContent = 'Copied!';
+      setTimeout(() => { btn.classList.remove('copied'); lbl.textContent = 'Copy'; }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

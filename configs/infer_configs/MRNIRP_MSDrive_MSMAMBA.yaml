@@ -1,0 +1,54 @@
+BASE: ['']
+TOOLBOX_MODE: "only_test"
+TEST:
+  METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA']
+  USE_LAST_EPOCH: True
+  DATA:
+    FILTERING:
+      USE_EXCLUSION_LIST: True
+      EXCLUSION_LIST: ["Subject18", "subject43"]
+      SEGMENT_LIST: ["S01","S02","S03"]
+      TASK: "driving"
+    FS: 30
+    DATASET: MSDrive
+    MODALITY: 'MULTI_SPECTRAL'
+    DO_PREPROCESS: False
+    DATA_FORMAT: NDCHW
+    DATA_PATH: "/path/to/MMDrive/RawData/"
+    CACHED_PATH: "/path/to/MMDrive/Processed_cross"
+    EXP_DATA_NAME: "Diff_160"
+    BEGIN: 0.0
+    END: 1.0
+    PREPROCESS:
+      DATA_TYPE: ['DiffNormalized']
+      LABEL_TYPE: DiffNormalized
+      DO_CHUNK: True
+      CHUNK_LENGTH: 160
+      CROP_FACE:
+        DO_CROP_FACE: True
+        BACKEND: 'Y5F'
+        USE_LARGE_FACE_BOX: True
+        LARGE_BOX_COEF: 1.2
+        FACE_ALIGNMENT: True
+        DETECTION:
+          DO_DYNAMIC_DETECTION: False
+          DYNAMIC_DETECTION_FREQUENCY: 30
+          USE_MEDIAN_FACE_BOX: False
+      RESIZE:
+        H: 128
+        W: 128
+DEVICE: cuda:0
+NUM_OF_GPU_TRAIN: 1
+LOG:
+  PATH: runs/exp
+MODEL:
+  DROP_RATE: 0.2
+  NAME: MSMamba
+  MODEL_DIR: "runs/model_outputs/MSMamba"
+INFERENCE:
+  BATCH_SIZE: 4
+  EVALUATION_METHOD: "FFT"
+  EVALUATION_WINDOW:
+    USE_SMALLER_WINDOW: False
+    WINDOW_SIZE: 10
+  MODEL_PATH: "pretrained_models/MRNIRP_MSMamba.pth"
