@@ -254,14 +254,11 @@ Built on the [rPPG-Toolbox](https://github.com/ubicomplab/rPPG-Toolbox) and
 If you use **MS-rPPG** or find this repository useful for your research, please cite our paper:
 
 ```bibtex
-@misc{choi2026msrppgmultispectralstatespace,
-  title         = {MS-rPPG: Multi-spectral State Space Model for Remote Photoplethysmography in Driver Monitoring Systems},
-  author        = {Choi, Jiho and Lee, Sang Jun},
-  year          = {2026},
-  eprint        = {2606.21115},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.CV},
-  url           = {https://arxiv.org/abs/2606.21115}
+@article{choi2026ms,
+  title={MS-rPPG: Multi-spectral State Space Model for Remote Photoplethysmography in Driver Monitoring Systems},
+  author={Choi, Jiho and Lee, Sang Jun},
+  journal={arXiv preprint arXiv:2606.21115},
+  year={2026}
 }
 ```
 
