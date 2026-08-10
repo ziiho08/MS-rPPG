@@ -16,37 +16,9 @@ both can be fused.
 ## Highlights
 
 - **Multi-spectral (RGB + NIR) fusion** with cross-spectral FiLM gating.
-- Single entry point (`main.py`) for **training, testing, and unsupervised baselines**.
 - Works with either modality: `MULTI_SPECTRAL`, `RGB`, or `NIR`.
-- Ships **pretrained MS-rPPG checkpoints** for MR-NIRP and PhysDrive.
-- Includes strong baselines: PhysNet, TS-CAN, DeepPhys, EfficientPhys, PhysFormer,
-  PhysMamba, RhythmFormer, RhythmMamba, iBVPNet, BigSmall, and unsupervised
-  methods (POS, CHROM, ICA, GREEN, LGI, PBV, OMIT).
+- **pretrained MS-rPPG checkpoints** for MR-NIRP and PhysDrive.
 
----
-
-## Repository structure
-
-```
-main.py                     # single entry point for all modes
-config.py                   # yacs-based configuration (defaults + path resolution)
-setup.sh                    # environment setup (conda or uv)
-requirements.txt
-configs/
-  train_configs/            # YAML for training runs  (TRAIN_TESTDATA_MODEL.yaml)
-  infer_configs/            # YAML for inference-only runs
-neural_methods/
-  model/                    # model definitions (MsMamba.py + baselines)
-  trainer/                  # one trainer per model (inherits BaseTrainer)
-  loss/                     # NegPearson, PhysFormer, RhythmFormer/Hybrid losses
-dataset/data_loader/        # one loader per dataset (inherits BaseLoader)
-evaluation/                 # metrics.py, post_process.py, Bland-Altman, cost calc
-unsupervised_methods/       # signal-processing baselines
-pretrained_models/          # released MS-rPPG checkpoints
-tools/                      # visualization / analysis utilities + vendored mamba
-```
-
----
 
 ## Installation
 
