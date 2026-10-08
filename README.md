@@ -1,17 +1,19 @@
-# MS-rPPG: Multi-Spectral Remote Photoplethysmography
+# MS-rPPG: Multi-spectral State Space Model for Remote Photoplethysmography in Driver Monitoring Systems
 
-MS-rPPG estimates the blood-volume-pulse (BVP) signal and heart rate from facial
-video. Unlike conventional RGB-only rPPG, MS-rPPG fuses **RGB and near-infrared
-(NIR)** streams, making it robust to the difficult illumination found in
-in-vehicle (driving) scenarios.
+<p align="center">
+  <a href="https://ieeexplore.ieee.org/abstract/document/11695785">
+    <img src="https://img.shields.io/badge/Paper-IEEE%20Xplore-00629B?logo=ieee&logoColor=white" alt="IEEE Xplore Paper">
+  </a>
+  <a href="https://arxiv.org/abs/2606.21115">
+    <img src="https://img.shields.io/badge/arXiv-2606.21115-B31B1B?logo=arxiv&logoColor=white" alt="arXiv Paper">
+  </a>
+</p>
 
-The core model, **`MSMamba`**, combines a lightweight 3D-conv trunk, a
-**cross-spectral FiLM (CSLM)** gating module that exchanges physiological-band
-information between the RGB and NIR streams, and a stack of Mamba-based temporal /
-channel scans with a frequency-domain FFN. Either modality can be used alone, or
-both can be fused.
+MS-rPPG estimates the blood-volume-pulse (BVP) signal and heart rate from facial video. Unlike conventional RGB-only rPPG, MS-rPPG fuses **RGB and near-infrared (NIR)** streams, making it robust to the difficult illumination found in in-vehicle (driving) scenarios.
 
----
+The core model, **`MSMamba`**, combines a lightweight 3D-conv trunk, a **cross-spectral FiLM (CSLM)** gating module that exchanges physiological-band information between the RGB and NIR streams, and a stack of Mamba-based temporal/channel scans with a frequency-domain FFN. Either modality can be used alone, or both can be fused.
+
+
 
 ## Highlights
 
