@@ -226,11 +226,13 @@ Built on the [rPPG-Toolbox](https://github.com/ubicomplab/rPPG-Toolbox) and
 If you use **MS-rPPG** or find this repository useful for your research, please cite our paper:
 
 ```bibtex
-@article{choi2026ms,
-  title={MS-rPPG: Multi-spectral State Space Model for Remote Photoplethysmography in Driver Monitoring Systems},
+@INPROCEEDINGS{11695785,
   author={Choi, Jiho and Lee, Sang Jun},
-  journal={arXiv preprint arXiv:2606.21115},
-  year={2026}
-}
+  booktitle={2026 IEEE International Conference on Robotics and Automation (ICRA)}, 
+  title={MS-rPPG: Multi-spectral State Space Model for Remote Photoplethysmography in Driver Monitoring Systems}, 
+  year={2026},
+  pages={10371-10378},
+  doi={10.1109/ICRA57385.2026.11695785}}
+
 ```
 
