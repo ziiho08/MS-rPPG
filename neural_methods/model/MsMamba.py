@@ -245,19 +245,19 @@ class MambaLayer(nn.Module):
         x_mamba = self.mamba(x)    
         return x_mamba
 
-# ------------------------- Cross-FiLM (원본 유지) -------------------------
+# ------------------------- Cross-FiLM (kept from the original) -------------------------
 class CrossFiLMGatingHP(nn.Module):
     """
     x_self <- FiLM( HP(x_other) ) + residual
-    - depthwise HP: 조명 DC/플리커 누출 감소
-    - 대칭 사용을 위해 같은 모듈을 RGB<-NIR, NIR<-RGB 모두에 재사용(share=True) 가능
+    - depthwise HP: reduces leakage of illumination DC / flicker
+    - for symmetric use, the same module can be reused for both RGB<-NIR and NIR<-RGB (share=True)
     """
     def __init__(self, c, k_hp=3, k_mixer=5, dil=1,
                  gamma_lim=0.25, beta_lim=0.5, gating_drop_p=0.0):
         super().__init__()
         pad_hp = (k_hp-1)//2
         self.hp = nn.Conv1d(c, c, k_hp, padding=pad_hp, groups=c, bias=True)
-        with torch.no_grad():                 # [1,-1,0] 초기화
+        with torch.no_grad():                 # initialize to [1,-1,0]
             w = torch.zeros(c,1,k_hp); w[:,:,0]=1; w[:,:,1]=-1
             self.hp.weight.copy_(w)
         pad = (k_mixer-1)//2
@@ -330,7 +330,7 @@ class FrequencyFiLMGating(nn.Module):
 
         y = x_self.transpose(1, 2) * (1 + g) + b
         return y.transpose(1, 2)
-# ------------------------- Heads & NIR attention (원본 유지) -------------------------
+# ------------------------- Heads & NIR attention (kept from the original) -------------------------
 class rPPGHead(nn.Module):
     def __init__(self, dim, k=5):
         super().__init__()
